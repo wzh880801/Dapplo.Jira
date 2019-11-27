@@ -76,6 +76,46 @@ namespace Dapplo.Jira
 		}
 
 		/// <summary>
+		///     Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.
+		///     See: https://developer.atlassian.com/cloud/jira/platform/rest/v3/#api-rest-api-3-issue-issueIdOrKey-transitions-post
+		/// </summary>
+		/// <param name="jiraClient">IIssueDomain to bind the extension method to</param>
+		/// <param name="issueKey">key for the issue</param>
+		/// <param name="to"></param>
+		/// <param name="assignee"></param>
+		/// <param name="cancellationToken">CancellationToken</param>
+		/// <returns>no-content</returns>
+        public static async Task<object> TransitionAsync(this IIssueDomain jiraClient, string issueKey, Status to, User assignee,
+    		CancellationToken cancellationToken = default)
+        {
+            if (issueKey == null)
+            {
+                throw new ArgumentNullException(nameof(issueKey));
+            }
+            Log.Debug().WriteLine("Performs an issue transition for {0}", issueKey);
+            var request = new
+            {
+                transition = new
+                {
+                    id = to.Id
+                },
+                fields = new
+                {
+                    assignee = new
+                    {
+                        name = assignee.Name
+                    }
+                }
+            };
+            jiraClient.Behaviour.MakeCurrent();
+            var attachUri = jiraClient.JiraRestUri.AppendSegments("issue", issueKey, "transitions");
+			attachUri.ExtendQuery("expand", "transitions.fields");
+			
+            var response = await attachUri.PostAsync<HttpResponse<object, Error>>(request, cancellationToken).ConfigureAwait(false);
+            return response.HandleErrors(HttpStatusCode.NoContent);
+		}
+
+		/// <summary>
 		///     Get issue information
 		///     See: https://docs.atlassian.com/jira/REST/latest/#d2e4539
 		/// </summary>

@@ -105,5 +105,11 @@ namespace Dapplo.Jira.Entities
 		/// </summary>
 		[JsonProperty("visibility")]
 		public Visibility Visibility { get; set; }
+
+		/// <summary>
+		///     Issue Id
+		/// </summary>
+		[JsonProperty("issueId")]
+        public long IssueId { get; set; }
 	}
 }

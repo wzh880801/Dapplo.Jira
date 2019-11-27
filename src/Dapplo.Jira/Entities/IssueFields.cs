@@ -192,5 +192,11 @@ namespace Dapplo.Jira.Entities
 		/// </summary>
 		[JsonProperty("worklog")]
 		public Worklogs Worklogs { get; set; }
+
+        /// <summary>
+        ///     Due date
+        /// </summary>
+        [JsonProperty("duedate")]
+        public DateTimeOffset DueDate { get; set; }
 	}
 }
